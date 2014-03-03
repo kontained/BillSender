@@ -300,6 +300,8 @@ void Form1::SendBill_Click(System::Object^  sender, System::EventArgs^  e) {
 
 	EmailTo->Text = "";
 	EmailSubject->Text = "";
+
+	MessageBox::Show("Message sent!", "Success!", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 }
 /*Gets the device information, scans in the image, and saves it to disk*/
 void Form1::ScanImage_Click(System::Object ^sender, System::EventArgs ^e) {
