@@ -198,7 +198,8 @@ namespace BillSender {
 			// 
 			this->ScannedImage->Location = System::Drawing::Point(12, 27);
 			this->ScannedImage->Name = L"ScannedImage";
-			this->ScannedImage->Size = System::Drawing::Size(615, 656);
+			this->ScannedImage->Size = System::Drawing::Size(615, 666);
+			this->ScannedImage->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
 			this->ScannedImage->TabIndex = 2;
 			this->ScannedImage->TabStop = false;
 			// 
