@@ -1,4 +1,5 @@
 #pragma once
+#include "EmailSettings.h"
 
 namespace BillSender {
 
@@ -11,6 +12,7 @@ namespace BillSender {
 	using namespace System::Drawing;
 	using namespace System::Net::Mail;
 	using namespace System::Drawing;
+	using namespace System::Collections::Generic;
 
 	/// <summary>
 	/// Summary for Form1
@@ -72,6 +74,10 @@ namespace BillSender {
 		System::ComponentModel::Container ^components;
 
 	private: String^ FileValue;
+	private: System::Windows::Forms::MenuStrip^  menuStrip1;
+	private: System::Windows::Forms::ToolStripMenuItem^  toolStripMenuItem1;
+	private: System::Windows::Forms::ToolStripMenuItem^  emailSettingsToolStripMenuItem;
+	private: List<String^> AttachmentList;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -91,8 +97,12 @@ namespace BillSender {
 			this->SendBill = (gcnew System::Windows::Forms::Button());
 			this->ScannedImage = (gcnew System::Windows::Forms::PictureBox());
 			this->ScanImage = (gcnew System::Windows::Forms::Button());
+			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
+			this->toolStripMenuItem1 = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->emailSettingsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->groupBox1->SuspendLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->ScannedImage))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->ScannedImage))->BeginInit();
+			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// groupBox1
@@ -103,7 +113,7 @@ namespace BillSender {
 			this->groupBox1->Controls->Add(this->RecentRecipList);
 			this->groupBox1->Controls->Add(this->label1);
 			this->groupBox1->Controls->Add(this->EmailTo);
-			this->groupBox1->Location = System::Drawing::Point(620, 34);
+			this->groupBox1->Location = System::Drawing::Point(632, 81);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Size = System::Drawing::Size(258, 402);
 			this->groupBox1->TabIndex = 0;
@@ -113,9 +123,9 @@ namespace BillSender {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->label3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->label3->Location = System::Drawing::Point(1, 62);
+			this->label3->Location = System::Drawing::Point(9, 62);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(61, 18);
 			this->label3->TabIndex = 5;
@@ -123,7 +133,7 @@ namespace BillSender {
 			// 
 			// EmailSubject
 			// 
-			this->EmailSubject->Location = System::Drawing::Point(68, 62);
+			this->EmailSubject->Location = System::Drawing::Point(76, 63);
 			this->EmailSubject->Name = L"EmailSubject";
 			this->EmailSubject->Size = System::Drawing::Size(176, 20);
 			this->EmailSubject->TabIndex = 1;
@@ -131,7 +141,7 @@ namespace BillSender {
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->label2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label2->Location = System::Drawing::Point(94, 96);
 			this->label2->Name = L"label2";
@@ -141,10 +151,10 @@ namespace BillSender {
 			// 
 			// RecentRecipList
 			// 
-			this->RecentRecipList->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->RecentRecipList->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->RecentRecipList->LabelWrap = false;
-			this->RecentRecipList->Location = System::Drawing::Point(68, 117);
+			this->RecentRecipList->Location = System::Drawing::Point(68, 119);
 			this->RecentRecipList->MultiSelect = false;
 			this->RecentRecipList->Name = L"RecentRecipList";
 			this->RecentRecipList->Size = System::Drawing::Size(176, 277);
@@ -157,9 +167,9 @@ namespace BillSender {
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->label1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->label1->Location = System::Drawing::Point(32, 21);
+			this->label1->Location = System::Drawing::Point(40, 21);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(30, 18);
 			this->label1->TabIndex = 1;
@@ -167,16 +177,16 @@ namespace BillSender {
 			// 
 			// EmailTo
 			// 
-			this->EmailTo->Location = System::Drawing::Point(68, 21);
+			this->EmailTo->Location = System::Drawing::Point(76, 21);
 			this->EmailTo->Name = L"EmailTo";
 			this->EmailTo->Size = System::Drawing::Size(176, 20);
 			this->EmailTo->TabIndex = 0;
 			// 
 			// SendBill
 			// 
-			this->SendBill->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->SendBill->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->SendBill->Location = System::Drawing::Point(717, 549);
+			this->SendBill->Location = System::Drawing::Point(717, 618);
 			this->SendBill->Name = L"SendBill";
 			this->SendBill->Size = System::Drawing::Size(105, 65);
 			this->SendBill->TabIndex = 3;
@@ -186,17 +196,17 @@ namespace BillSender {
 			// 
 			// ScannedImage
 			// 
-			this->ScannedImage->Location = System::Drawing::Point(12, 12);
+			this->ScannedImage->Location = System::Drawing::Point(12, 27);
 			this->ScannedImage->Name = L"ScannedImage";
-			this->ScannedImage->Size = System::Drawing::Size(602, 602);
+			this->ScannedImage->Size = System::Drawing::Size(615, 656);
 			this->ScannedImage->TabIndex = 2;
 			this->ScannedImage->TabStop = false;
 			// 
 			// ScanImage
 			// 
-			this->ScanImage->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+			this->ScanImage->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
-			this->ScanImage->Location = System::Drawing::Point(717, 463);
+			this->ScanImage->Location = System::Drawing::Point(717, 532);
 			this->ScanImage->Name = L"ScanImage";
 			this->ScanImage->Size = System::Drawing::Size(105, 65);
 			this->ScanImage->TabIndex = 2;
@@ -204,17 +214,43 @@ namespace BillSender {
 			this->ScanImage->UseVisualStyleBackColor = true;
 			this->ScanImage->Click += gcnew System::EventHandler(this, &Form1::ScanImage_Click);
 			// 
+			// menuStrip1
+			// 
+			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->toolStripMenuItem1 });
+			this->menuStrip1->Location = System::Drawing::Point(0, 0);
+			this->menuStrip1->Name = L"menuStrip1";
+			this->menuStrip1->RenderMode = System::Windows::Forms::ToolStripRenderMode::Professional;
+			this->menuStrip1->Size = System::Drawing::Size(890, 24);
+			this->menuStrip1->TabIndex = 4;
+			this->menuStrip1->Text = L"menuStrip1";
+			// 
+			// toolStripMenuItem1
+			// 
+			this->toolStripMenuItem1->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->emailSettingsToolStripMenuItem });
+			this->toolStripMenuItem1->Name = L"toolStripMenuItem1";
+			this->toolStripMenuItem1->Size = System::Drawing::Size(37, 20);
+			this->toolStripMenuItem1->Text = L"File";
+			// 
+			// emailSettingsToolStripMenuItem
+			// 
+			this->emailSettingsToolStripMenuItem->Name = L"emailSettingsToolStripMenuItem";
+			this->emailSettingsToolStripMenuItem->Size = System::Drawing::Size(148, 22);
+			this->emailSettingsToolStripMenuItem->Text = L"Email Settings";
+			this->emailSettingsToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::emailSettingsToolStripMenuItem_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(890, 626);
+			this->ClientSize = System::Drawing::Size(890, 695);
 			this->Controls->Add(this->ScanImage);
 			this->Controls->Add(this->ScannedImage);
 			this->Controls->Add(this->SendBill);
 			this->Controls->Add(this->groupBox1);
+			this->Controls->Add(this->menuStrip1);
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
-			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
+			this->MainMenuStrip = this->menuStrip1;
 			this->MaximizeBox = false;
 			this->MinimizeBox = false;
 			this->Name = L"Form1";
@@ -223,8 +259,11 @@ namespace BillSender {
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->ScannedImage))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->ScannedImage))->EndInit();
+			this->menuStrip1->ResumeLayout(false);
+			this->menuStrip1->PerformLayout();
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -232,6 +271,7 @@ namespace BillSender {
 		public: System::Void ScanImage_Click(System::Object^  sender, System::EventArgs^  e);
 		public: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e);
 		public: System::Void RecentRecipList_DoubleClick(System::Object^  sender, System::EventArgs^  e);
-	};
+		public: System::Void emailSettingsToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e);
+};
 }
 
