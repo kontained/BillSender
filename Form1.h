@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace BillSender {
 
 	using namespace System;
@@ -229,11 +228,10 @@ namespace BillSender {
 
 		}
 #pragma endregion
-
-public: System::Void SendBill_Click(System::Object^  sender, System::EventArgs^  e);
-public: System::Void ScanImage_Click(System::Object^  sender, System::EventArgs^  e);
-public: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e);
-public: System::Void RecentRecipList_DoubleClick(System::Object^  sender, System::EventArgs^  e);
-};
+		public: System::Void SendBill_Click(System::Object^  sender, System::EventArgs^  e);
+		public: System::Void ScanImage_Click(System::Object^  sender, System::EventArgs^  e);
+		public: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e);
+		public: System::Void RecentRecipList_DoubleClick(System::Object^  sender, System::EventArgs^  e);
+	};
 }
 

@@ -1,6 +1,7 @@
 // BillSender.cpp : main project file.
 #include "stdafx.h"
 #include "Form1.h"
+#include <shlobj.h>
 #include <vcclr.h>
 #include <Windows.h>
 #include <Wia.h>
@@ -8,8 +9,11 @@
 #include <comdef.h>
 
 using namespace BillSender;
+TCHAR DIRECTORY[MAX_PATH];
 _bstr_t DevID;
 [STAThreadAttribute]
+
+#pragma comment(lib, "shell32.lib")
 
 HRESULT CreateWiaDeviceManager(IWiaDevMgr2** ppWiaDevMgr)
 {
@@ -229,19 +233,51 @@ int GetFileCount()
 {
 	String^ line;
 	int value = 0;
-	
-	StreamReader^ in = gcnew StreamReader("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\count.ini");
 
-	line = in->ReadLine();
-	in->Close();
+	//Convert DIRECTORY to string, then add "\\BillSender\\" to it
+	String^ dir = "";
+	String^ dir1 = "\\BillSender\\";
+	TCHAR tmp[MAX_PATH];
+	wmemset(tmp, L'', MAX_PATH);
 
-	value = Convert::ToInt32(line);
-	value++;
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if (DIRECTORY[i] == NULL)
+		{
+			dir = dir + dir1;
+			break;
+		}
+		else
+			dir = dir + DIRECTORY[i];
+	}
 
-	StreamWriter^ out = gcnew StreamWriter("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\count.ini");
-	
-	out->Write(Convert::ToString(value));
-	out->Close();
+	for (int i = 0; i < dir->Length; i++)
+	{
+		if (dir[i] == NULL)
+			break;
+		else
+			tmp[i] = dir[i];
+	}
+
+	try
+	{
+		wcsncat_s(tmp, L"count.ini", wcslen(tmp) + 16);
+		CreateFile(tmp, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		StreamReader^ in = gcnew StreamReader(dir + "count.ini");
+
+		line = in->ReadLine();
+		in->Close();
+
+		value = Convert::ToInt32(line);
+		value++;
+
+		StreamWriter^ out = gcnew StreamWriter(dir + "count.ini");
+
+		out->Write(Convert::ToString(value));
+		out->Close();
+	}
+	catch (...){}
 
 	return value;
 }
@@ -260,6 +296,31 @@ void Form1::SendBill_Click(System::Object^  sender, System::EventArgs^  e) {
 	//gmail server info
 	int port = 587;
 	String^ server = "smtp.gmail.com";
+
+	//Convert DIRECTORY to string, then add "\\BillSender\\" to it
+	String^ dir = "";
+	String^ dir1 = "\\BillSender\\";
+	TCHAR tmp[MAX_PATH];
+	wmemset(tmp, L'', MAX_PATH);
+
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if (DIRECTORY[i] == NULL)
+		{
+			dir = dir + dir1;
+			break;
+		}
+		else
+			dir = dir + DIRECTORY[i];
+	}
+
+	for (int i = 0; i < dir->Length; i++)
+	{
+		if (dir[i] == NULL)
+			break;
+		else
+			tmp[i] = dir[i];
+	}
 
 	//To field empty
 	if (String::IsNullOrEmpty(EmailTo->Text))
@@ -298,20 +359,28 @@ void Form1::SendBill_Click(System::Object^  sender, System::EventArgs^  e) {
 	client->EnableSsl = true;
 
 	//Attach the image
-	Attachment^ data = gcnew Attachment("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\" + FileValue + ".jpg");
+	Attachment^ data = gcnew Attachment(dir + FileValue + ".jpg");
 	msg->Attachments->Add(data);
-
 
 	//send the message
 	try
 	{
 		client->Send(msg);
 	}
-	catch (...){}
+	catch (SmtpFailedRecipientException^ e)
+	{
+		MessageBox::Show("Failed to send email to recipient. \n Please make sure email address is correct.", "ERROR", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return;
+	}
+	catch (...)
+	{
+		MessageBox::Show("Error sending Email. \n Please try again.", "ERROR", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return;
+	}
 	client->~SmtpClient();
 
 	//Write the email to the recent email list for easy access next time to emails.
-	StreamWriter^ out = gcnew StreamWriter("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\recentEmails.txt", true);
+	StreamWriter^ out = gcnew StreamWriter(dir + "recentEmails.txt", true);
 	out->WriteLine(EmailTo->Text);
 	out->Close();
 
@@ -329,6 +398,31 @@ void Form1::ScanImage_Click(System::Object ^sender, System::EventArgs ^e) {
 	int fileCount = 0;
 	BSTR *files = new BSTR[0];
 
+	//Convert DIRECTORY to string, then add "\\BillSender\\" to it
+	String^ dir = "";
+	String^ dir1 = "\\BillSender\\";
+	TCHAR tmp[MAX_PATH];
+	wmemset(tmp, L'', MAX_PATH);
+
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if (DIRECTORY[i] == NULL)
+		{
+			dir = dir + dir1;
+			break;
+		}
+		else
+			dir = dir + DIRECTORY[i];
+	}
+
+	for (int i = 0; i < dir->Length; i++)
+	{
+		if (dir[i] == NULL)
+			break;
+		else
+			tmp[i] = dir[i];
+	}
+
 	FileValue = gcnew String("TMS");
 
 	fileCount = GetFileCount();
@@ -338,7 +432,7 @@ void Form1::ScanImage_Click(System::Object ^sender, System::EventArgs ^e) {
 	pin_ptr<const wchar_t> wch = PtrToStringChars(FileValue);
 	printf_s("%S\n", wch);
 
-	hr = CreateWiaDeviceManager( &devMgr );
+	hr = CreateWiaDeviceManager(&devMgr);
 
 	if (hr == S_OK)
 		hr = GetWiaDevices(devMgr);
@@ -346,34 +440,87 @@ void Form1::ScanImage_Click(System::Object ^sender, System::EventArgs ^e) {
 	if (hr == S_OK)
 		hr = CreateWiaDevice(devMgr, DevID, &item);
 
-	_bstr_t FolderName(L"C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender");
+
+	_bstr_t FolderName(tmp);
 	_bstr_t FileName(wch);
 
-	//Displays a dialog that allows the user to select properties, then scan.
-	hr = item->DeviceDlg(0, GetActiveWindow(), FolderName, FileName, &x, &files, &item);
+	try
+	{
+		//Displays a dialog that allows the user to select properties, then scan.
+		hr = item->DeviceDlg(0, GetActiveWindow(), FolderName, FileName, &x, &files, &item);
+	}
+	catch (...)
+	{
+		MessageBox::Show("Failed to scan the image. \n Please make sure the scanner is on.", "ERROR", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return;
+	}
 
+	//Display the image to the screen
 	ScannedImage->SizeMode = PictureBoxSizeMode::StretchImage;
-	ScannedImage->Load("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\" + FileValue + ".jpg");
+	ScannedImage->Load(dir + FileValue + ".jpg");
 	ScannedImage->Show();
 }
-/*Load recent recipients box and display the welcome image*/
+/*Load recent recipients box and display the welcome image
+Also retrieves the 'My Documents' folder for the user*/
 void Form1::Form1_Load(System::Object^  sender, System::EventArgs^  e)
 {
-	//Show welcome image
-	ScannedImage->SizeMode = PictureBoxSizeMode::StretchImage;
-	ScannedImage->Load("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\WelcomePage.jpg");
-	ScannedImage->Show();
+	//Get the my documents directory for the logged in user
+	HRESULT hr = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, DIRECTORY);
+
+	//Convert DIRECTORY to string, then add "\\BillSender\\" to it
+	String^ dir = "";
+	String^ dir1 = "\\BillSender\\";
+	TCHAR tmp[MAX_PATH];
+	wmemset(tmp, L'', MAX_PATH);
+
+	for (int i = 0; i < MAX_PATH; i++)
+	{
+		if (DIRECTORY[i] == NULL)
+		{
+			dir = dir + dir1;
+			break;
+		}
+		else
+			dir = dir + DIRECTORY[i];
+	}
+
+	for (int i = 0; i < dir->Length; i++)
+	{
+		if (dir[i] == NULL)
+			break;
+		else
+			tmp[i] = dir[i];
+	}
+
+	//create the BillSender directory if it doesn't exist
+	CreateDirectory(tmp, NULL);
+
+	//Show Welcome image
+	try
+	{
+		ScannedImage->SizeMode = PictureBoxSizeMode::StretchImage;
+		ScannedImage->Load(dir + "WelcomePage.jpg");
+		ScannedImage->Show();
+	}
+	catch (...){}
 
 	//read in recent recipients
-	StreamReader^ in = gcnew StreamReader("C:\\Users\\Kelly\\Downloads\\Documents\\Traditional Mechanical Quotes\\BillSender\\recentEmails.txt");
-
-	String^ Recipient;
-
-	while ((Recipient = in->ReadLine()) != nullptr)
+	try
 	{
-		RecentRecipList->Items->Add(Recipient);
+		//concat "recentEmails.txt" to the end of the string so we can create the file
+		wcsncat_s(tmp, L"recentEmails.txt", wcslen(tmp) + 16);
+		CreateFile(tmp, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		StreamReader^ in = gcnew StreamReader(dir + "recentEmails.txt");
+
+		String^ Recipient;
+
+		while ((Recipient = in->ReadLine()) != nullptr)
+			RecentRecipList->Items->Add(Recipient);
+
+		in->Close();
 	}
-	in->Close();
+	catch (...){}
 }
 /*Double click an email to place it into the email field*/
 void Form1::RecentRecipList_DoubleClick(System::Object^  sender, System::EventArgs^  e)
