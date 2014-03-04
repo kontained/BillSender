@@ -245,6 +245,13 @@ void Form1::SendBill_Click(System::Object^  sender, System::EventArgs^  e) {
 		return;
 	}
 
+	//Check to see if there are images.
+	if (AttachmentList.Count == 0)
+	{
+		MessageBox::Show("There are no scanned images! \n Please scan some images.", "No Images!", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return;
+	}
+
 	//Set the from, to, subject, and body of the email
 	String^ From = UserName();
 
@@ -267,10 +274,10 @@ void Form1::SendBill_Click(System::Object^  sender, System::EventArgs^  e) {
 	//gmail requires ssl
 	client->EnableSsl = true;
 
-	//Attach the image
+	//Attach the image(s)
 	for (int i = 0; i < AttachmentList.Count; i++)
 	{
-		Attachment^ data = gcnew Attachment(AttachmentList[i] +".jpg");
+		Attachment^ data = gcnew Attachment(AttachmentList[i] + ".jpg");
 		msg->Attachments->Add(data);
 	}
 
